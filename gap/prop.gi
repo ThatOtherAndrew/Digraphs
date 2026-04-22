@@ -200,7 +200,6 @@ function(D)
   fi;
   # 1. Topologically sort the nodes in D.
   copy := DigraphRemoveLoops(DigraphMutableCopyIfMutable(D));
-  # ^ protect from nasty mutable side effects i think
   order := DigraphTopologicalSort(copy);
   if order = fail then
     return false;
