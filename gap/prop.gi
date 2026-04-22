@@ -91,6 +91,59 @@ function(D, P, U, join)
   return tab;
 end);
 
+# Variant of DIGRAPHS_MeetJoinTable that does not require the input digraph
+# to have all transitive edges: reachability between previously processed
+# vertices is checked via the table being constructed, rather than via
+# direct edge queries on the input digraph.
+# Note: above descriptive comment is LLM-generated.
+BindGlobal("DIGRAPHS_MeetJoinTableBetweenCover",
+function(N, P, U, join)
+  local ord, tab, S, i, x, T, l, q, z, y;
+
+  tab := List([1 .. N], x -> []);
+
+  ord := [];
+  for i in [1 .. N] do
+    ord[P[i]] := i;
+  od;
+
+  S := [];
+
+  for x in P do
+    tab[x, x] := x;
+    for y in S do
+      T := [];
+      for z in U[x] do
+        Add(T, tab[y, z]);
+      od;
+      T := Set(T);
+      l := Length(T);
+      if l = 0 then
+        return fail;
+      fi;
+      q := T[l];
+      for i in [1 .. l - 1] do
+        z := T[i];
+        if ord[z] > ord[q] then
+          q := z;
+        fi;
+      od;
+      for z in T do
+        # the below conditions are the only part that differs from MeetJoinTable above
+        if join and tab[q, z] <> z then
+          return fail;
+        elif not join and tab[z, q] <> z then
+          return fail;
+        fi;
+      od;
+      tab[x, y] := q;
+      tab[y, x] := q;
+    od;
+    Add(S, x);
+  od;
+  return tab;
+end);
+
 InstallMethod(DIGRAPHS_IsJoinSemilatticeAndJoinTable, "for a digraph",
 [IsDigraph],
 function(D)
