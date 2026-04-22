@@ -129,7 +129,8 @@ function(N, P, U, join)
         fi;
       od;
       for z in T do
-        # the below conditions are the only part that differs from MeetJoinTable above
+        # the below conditions are the only part that
+        # differs from MeetJoinTable above
         if join and tab[q, z] <> z then
           return fail;
         elif not join and tab[z, q] <> z then
@@ -196,21 +197,22 @@ function(D)
   local copy, order, hasse, neighbours, table;
 
   # 1. Topologically sort the nodes in D.
-  copy := DigraphRemoveLoops(DigraphMutableCopyIfMutable(D)); # protect from nasty mutable side effects i think
+  copy := DigraphRemoveLoops(DigraphMutableCopyIfMutable(D));
+  # ^ protect from nasty mutable side effects i think
   order := DigraphTopologicalSort(copy);
   if order = fail then
     return false;
   fi;
 
-  # 2. Iterate through pairs of nodes of D in topological order and construct a table of their meets.
+  # 2. Iterate through pairs of nodes of D in topological order
+  # and construct a table of their meets.
   hasse := DigraphTransitiveReduction(copy);
   neighbours := InNeighbours(hasse);
   table := DIGRAPHS_MeetJoinTableBetweenCover(
     DigraphNrVertices(copy),
     Reversed(order),
     neighbours,
-    false
-  );
+    false);
   if table = fail then
     return false;
   fi;
@@ -220,8 +222,7 @@ function(D)
     DigraphNrVertices(copy),
     order,
     neighbours,
-    true
-  );
+    true);
   return table <> fail;
 end);
 
