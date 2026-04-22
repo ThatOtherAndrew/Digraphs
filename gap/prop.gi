@@ -140,23 +140,36 @@ D -> DIGRAPHS_IsMeetSemilatticeAndMeetTable(D)[1]);
 InstallMethod(IsBetweenCoverAndLattice, "for a digraph",
 [IsDigraph],
 function(D)
-  local order, hasse;
+  local copy, order, hasse, neighbours, table;
 
   # 1. Topologically sort the nodes in D.
+  copy := DigraphRemoveLoops(DigraphMutableCopyIfMutable(D)); # protect from nasty mutable side effects i think
   order := DigraphTopologicalSort(copy);
   if order = fail then
     return false;
   fi;
 
   # 2. Iterate through pairs of nodes of D in topological order and construct a table of their meets.
-  hasse := DigraphTransitiveReduction(DigraphMutableCopyIfMutable(copy));
-  in := InNeighbours(hasse);
-  # something along the lines of DigraphMeetTable()
-  out := OutNeighbours(hasse);
-  # something along the lines of DigraphJoinTable()
+  hasse := DigraphTransitiveReduction(copy);
+  neighbours := InNeighbours(hasse);
+  table := DIGRAPHS_MeetJoinTableBetweenCover(
+    DigraphNrVertices(copy),
+    Reversed(order),
+    neighbours,
+    false
+  );
+  if table = fail then
+    return false;
+  fi;
 
-  # TODO: step 3
-  return true;
+  neighbours := OutNeighbours(hasse);
+  table := DIGRAPHS_MeetJoinTableBetweenCover(
+    DigraphNrVertices(copy),
+    order,
+    neighbours,
+    true
+  );
+  return table <> fail;
 end);
 
 InstallImmediateMethod(IsStronglyConnectedDigraph,
