@@ -195,7 +195,9 @@ InstallMethod(IsBetweenCoverAndLattice, "for a digraph",
 [IsDigraph],
 function(D)
   local copy, order, hasse, neighbours, table;
-
+ if IsMultiDigraph(D) then
+    ErrorNoReturn("the argument must not be a multidigraph,");
+  fi;
   # 1. Topologically sort the nodes in D.
   copy := DigraphRemoveLoops(DigraphMutableCopyIfMutable(D));
   # ^ protect from nasty mutable side effects i think
